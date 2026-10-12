@@ -24,6 +24,8 @@ import {
 import { kindLabel } from "../kube/catalog";
 import { isExpandable, type TreeNode } from "../kube/tree";
 import { SidebarStatus } from "./sidebar-status";
+import { useObjectActions } from "./object-actions";
+import { useTerminal } from "../context/terminal";
 
 const SIDEBAR_WIDTH = 42;
 
@@ -51,6 +53,8 @@ export function Tree() {
   const { setActivePane, isPaneFocused } = useFocus();
   const theme = useTheme();
   const isFocused = () => isPaneFocused("tree");
+  const actions = useObjectActions();
+  const terminal = useTerminal();
   let scrollRef: ScrollBoxRenderable | undefined;
   let lastIndex = 0;
 
@@ -118,6 +122,16 @@ export function Tree() {
       [Commands.VIEW_DESCRIBE]: () => showView(ContentView.DESCRIBE),
       [Commands.VIEW_YAML]: () => showView(ContentView.YAML),
       [Commands.VIEW_LOGS]: () => showView(ContentView.LOGS),
+      [Commands.SHELL_OPEN]: () => actions.shell(),
+      [Commands.EDIT_OPEN]: () => actions.edit(),
+      [Commands.OBJECT_DELETE]: () => actions.delete(),
+      [Commands.ROLLOUT_RESTART]: () => actions.restart(),
+      [Commands.OBJECT_SCALE]: () => actions.scale(),
+      [Commands.TERMINAL_CLOSE]: () => {
+        if (!terminal.state()) return false;
+        terminal.close();
+        return true;
+      },
     },
     { target: () => pane },
   );

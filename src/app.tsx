@@ -18,6 +18,10 @@ import {
 import { KubeProvider } from "./context/kube";
 import { Tree } from "./components/tree";
 import { Content } from "./components/content";
+import { TerminalPane } from "./components/terminal-pane";
+import { TerminalProvider, useTerminal } from "./context/terminal";
+import { DialogProvider, DIALOG_MODAL } from "./context/dialog";
+import { Dialog } from "./components/dialog";
 import { NamespacePicker } from "./components/namespace-picker";
 import { KubeCommandPalette } from "./components/command-palette";
 import { Commands } from "./commands";
@@ -35,6 +39,7 @@ function AppContent() {
     closeModal,
   } = useFocus();
   const theme = useTheme();
+  const terminal = useTerminal();
 
   let layout: Renderable | undefined;
   useScope(
@@ -68,7 +73,9 @@ function AppContent() {
         <Show when={sidebarVisible()}>
           <Tree />
         </Show>
-        <Content />
+        <Show when={terminal.state()} fallback={<Content />}>
+          <TerminalPane />
+        </Show>
       </box>
 
       <Show when={activeModal() === "palette"}>
@@ -81,6 +88,9 @@ function AppContent() {
           scopeOrder={["app", "tree", "content"]}
         />
       </Show>
+      <Show when={activeModal() === DIALOG_MODAL}>
+        <Dialog />
+      </Show>
       <Show when={activeModal() === "namespace"}>
         <NamespacePicker onClose={closeModal} />
       </Show>
@@ -92,14 +102,18 @@ export function App(props: { target: KubeTarget; namespace?: string }) {
   return (
     <ThemeProvider>
       <KubeProvider target={props.target} namespace={props.namespace}>
-        <FocusProvider panes={PANES}>
-          <ToastProvider>
-            <KeymapProvider keymap={keymap}>
-              <AppContent />
-              <Toast />
-            </KeymapProvider>
-          </ToastProvider>
-        </FocusProvider>
+        <TerminalProvider>
+          <FocusProvider panes={PANES}>
+            <ToastProvider>
+              <KeymapProvider keymap={keymap}>
+                <DialogProvider>
+                  <AppContent />
+                </DialogProvider>
+                <Toast />
+              </KeymapProvider>
+            </ToastProvider>
+          </FocusProvider>
+        </TerminalProvider>
       </KubeProvider>
     </ThemeProvider>
   );

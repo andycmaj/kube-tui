@@ -19,4 +19,15 @@ export const Commands = {
   VIEW_YAML: "view.yaml",
   VIEW_LOGS: "view.logs",
   SCROLL_FOLLOW: "scroll.follow",
+
+  // Embedded terminal
+  SHELL_OPEN: "terminal.shell",
+  EDIT_OPEN: "terminal.edit",
+  TERMINAL_DETACH: "terminal.detach",
+  TERMINAL_CLOSE: "terminal.close",
+
+  // Mutations (confirmed in a dialog)
+  OBJECT_DELETE: "object.delete",
+  ROLLOUT_RESTART: "object.restart",
+  OBJECT_SCALE: "object.scale",
 } as const;

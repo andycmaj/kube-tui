@@ -20,6 +20,16 @@ const viewBindings: BindingSpec[] = [
   { key: "d", cmd: Commands.VIEW_DESCRIBE, desc: "describe", help: "describe" },
   { key: "y", cmd: Commands.VIEW_YAML, desc: "yaml", help: "yaml" },
   { key: "l", cmd: Commands.VIEW_LOGS, desc: "logs", help: "logs" },
+  { key: "s", cmd: Commands.SHELL_OPEN, desc: "shell", help: "shell" },
+  { key: "e", cmd: Commands.EDIT_OPEN, desc: "edit", help: "edit" },
+  {
+    key: "ctrl+d",
+    cmd: Commands.OBJECT_DELETE,
+    desc: "delete",
+    help: "delete",
+  },
+  { key: "shift+r", cmd: Commands.ROLLOUT_RESTART, desc: "rollout restart" },
+  { key: "shift+s", cmd: Commands.OBJECT_SCALE, desc: "scale" },
 ];
 
 export const keymap: KeymapTable = {
@@ -43,11 +53,22 @@ export const keymap: KeymapTable = {
     { key: "right", cmd: Commands.TREE_EXPAND, desc: "expand" },
     { key: "left", cmd: Commands.TREE_COLLAPSE, desc: "collapse" },
     { key: "c", cmd: Commands.TREE_COLLAPSE_ALL, desc: "collapse all" },
+    { key: "x", cmd: Commands.TERMINAL_CLOSE, desc: "close terminal session" },
     ...viewBindings,
   ],
   content: [
     ...navBindings(),
     ...viewBindings,
-    { key: "s", cmd: Commands.SCROLL_FOLLOW, desc: "follow", help: "follow" },
+    { key: "f", cmd: Commands.SCROLL_FOLLOW, desc: "follow", help: "follow" },
+  ],
+  // While a session runs, every key but these goes to the PTY
+  // (useKeyPassthrough), so keep this list to chords no program needs.
+  terminal: [
+    {
+      key: "ctrl+]",
+      cmd: Commands.TERMINAL_DETACH,
+      desc: "detach",
+      help: "detach",
+    },
   ],
 };

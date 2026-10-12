@@ -29,6 +29,7 @@ import { kubectlCommand, runKubectl } from "../kube/kubectl";
 import { kindKey, type TreeNode } from "../kube/tree";
 import { resourceArg, type KindDef, type KubeObject } from "../kube/types";
 import { ALL_NAMESPACES, namespaceArgs } from "../kube/watch";
+import { useObjectActions } from "./object-actions";
 
 const LOGGABLE = new Set([
   "Pod",
@@ -92,6 +93,7 @@ export function Content() {
   const theme = useTheme();
   const { showToast } = useToast();
   const source = createMemoryLogSource();
+  const actions = useObjectActions();
   const [following, setFollowing] = createSignal(true);
   const [loading, setLoading] = createSignal(false);
 
@@ -258,6 +260,11 @@ export function Content() {
       [Commands.VIEW_DESCRIBE]: () => kube.setView(ContentView.DESCRIBE),
       [Commands.VIEW_YAML]: () => kube.setView(ContentView.YAML),
       [Commands.VIEW_LOGS]: () => kube.setView(ContentView.LOGS),
+      [Commands.SHELL_OPEN]: () => actions.shell(),
+      [Commands.EDIT_OPEN]: () => actions.edit(),
+      [Commands.OBJECT_DELETE]: () => actions.delete(),
+      [Commands.ROLLOUT_RESTART]: () => actions.restart(),
+      [Commands.OBJECT_SCALE]: () => actions.scale(),
     },
     { target: () => pane },
   );
