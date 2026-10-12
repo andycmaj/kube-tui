@@ -1,0 +1,32 @@
+{
+  "name": "@andycmaj/kube-tui",
+  "version": "0.0.1",
+  "description": "A Kubernetes TUI built with OpenTUI Solid",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "kube-tui": "./src/index.tsx"
+  },
+  "scripts": {
+    "dev": "bun run --conditions=browser --preload @opentui/solid/preload ./src/index.tsx",
+    "debug": "SHOW_CONSOLE=true bun run --inspect-wait --conditions=browser --preload @opentui/solid/preload ./src/index.tsx",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "format": "prettier --write src"
+  },
+  "dependencies": {
+    "@andycmaj/opentui-app": "0.3.0",
+    "@opentui/core": "0.5.12",
+    "@opentui/solid": "0.5.12",
+    "citty": "^0.2.2",
+    "effection": "4.0.2",
+    "ghostty-opentui": "1.5.0",
+    "solid-js": "1.9.12"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "25.2.0",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  }
+}
