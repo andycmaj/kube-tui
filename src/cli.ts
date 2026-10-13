@@ -1,4 +1,5 @@
 import { defineCommand, runMain } from "citty";
+import { APP_VERSION } from "./version";
 
 export interface CLIConfig {
   context?: string;
@@ -6,10 +7,14 @@ export interface CLIConfig {
   kubeconfig?: string;
 }
 
-let config: CLIConfig = {};
+let config: CLIConfig | undefined;
 
 const main = defineCommand({
-  meta: { name: "kube-tui", description: "A Kubernetes TUI" },
+  meta: {
+    name: "kube-tui",
+    version: APP_VERSION,
+    description: "A Kubernetes TUI",
+  },
   args: {
     context: { type: "string", description: "kubeconfig context to use" },
     namespace: {
@@ -30,5 +35,7 @@ const main = defineCommand({
 
 export async function parseCLI(): Promise<CLIConfig> {
   await runMain(main);
+  // citty prints --help/--version without calling run() and without exiting.
+  if (!config) process.exit(0);
   return config;
 }
