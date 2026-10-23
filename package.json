@@ -10,6 +10,9 @@
   "scripts": {
     "dev": "bun run --conditions=browser --preload @opentui/solid/preload ./src/index.tsx",
     "debug": "SHOW_CONSOLE=true bun run --inspect-wait --conditions=browser --preload @opentui/solid/preload ./src/index.tsx",
+    "build:binary": "bun run script/build.ts",
+    "build:binary:single": "bun run script/build.ts --single",
+    "version:bump": "bun run script/version.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "format": "prettier --write src"
