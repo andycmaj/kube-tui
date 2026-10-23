@@ -41,6 +41,12 @@ export const keymap: KeymapTable = {
       desc: "namespace",
       help: "namespace",
     },
+    {
+      key: "space",
+      cmd: Commands.QUICK_SEARCH,
+      desc: "quick search",
+      help: "search",
+    },
   ],
   tree: [
     ...treeNav,
@@ -60,6 +66,18 @@ export const keymap: KeymapTable = {
     ...navBindings(),
     ...viewBindings,
     { key: "f", cmd: Commands.SCROLL_FOLLOW, desc: "follow", help: "follow" },
+    { key: "/", cmd: Commands.CONTENT_SEARCH, desc: "find", help: "find" },
+    {
+      key: "escape",
+      cmd: Commands.CONTENT_SEARCH_CLEAR,
+      desc: "clear find",
+    },
+    {
+      key: "c",
+      cmd: Commands.LOG_CONTAINER,
+      desc: "log container",
+      help: "container",
+    },
   ],
   // While a session runs, every key but these goes to the PTY
   // (useKeyPassthrough), so keep this list to chords no program needs.

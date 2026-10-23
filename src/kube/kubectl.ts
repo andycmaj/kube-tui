@@ -51,7 +51,9 @@ export interface KubectlResult {
 export async function runKubectl(
   target: KubeTarget,
   args: string[],
-  options: { signal?: AbortSignal } = {},
+  // allowFailure returns whatever stdout kubectl managed, e.g. a multi-kind
+  // `get` where one kind is forbidden still lists the others.
+  options: { signal?: AbortSignal; allowFailure?: boolean } = {},
 ): Promise<KubectlResult> {
   const proc = Bun.spawn(kubectlCommand(target, args), {
     stdout: "pipe",
@@ -63,7 +65,8 @@ export async function runKubectl(
     new Response(proc.stderr).text(),
     proc.exited,
   ]);
-  if (exitCode !== 0) throw new KubectlError(args, exitCode, stderr);
+  if (exitCode !== 0 && !options.allowFailure)
+    throw new KubectlError(args, exitCode, stderr);
   return { stdout, stderr };
 }
 

@@ -49,6 +49,8 @@ interface KubeState {
   expanded: Record<string, boolean>;
   selectedId: string | null;
   view: ContentView;
+  // Chosen log container per object uid; absent = all containers.
+  logContainer: Record<string, string | undefined>;
   watchStatus: Record<string, WatchStatus>;
   watchError: Record<string, string>;
 }
@@ -69,6 +71,10 @@ interface KubeContextValue {
   allKinds: () => KindDef[];
   // Expand the path to a kind, start its watch, and select it.
   revealKind: (def: KindDef) => void;
+  // As revealKind, but select one of its objects. The tree keeps the cursor
+  // in place until the watch delivers it.
+  revealObject: (def: KindDef, object: KubeObject) => void;
+  setLogContainer: (uid: string, container: string | null) => void;
 }
 
 const [KubeContext, useKube] = createRequiredContext<KubeContextValue>("Kube");
@@ -89,6 +95,7 @@ export function KubeProvider(
     expanded: {},
     selectedId: null,
     view: ContentView.DESCRIBE,
+    logContainer: {},
     watchStatus: {},
     watchError: {},
   });
@@ -237,6 +244,20 @@ export function KubeProvider(
     tasks.clear();
   });
 
+  function expandPath(def: KindDef) {
+    const key = kindKey(def);
+    const category = BUILTIN_CATEGORIES.find((c) =>
+      c.kinds.some((k) => kindKey(k) === key),
+    );
+    if (category) {
+      setState("expanded", `cat:${category.id}`, true);
+    } else {
+      setState("expanded", CUSTOM_CATEGORY_ID, true);
+      setState("expanded", `grp:${def.group}`, true);
+    }
+    setState("expanded", `kind:${key}`, true);
+  }
+
   const value: KubeContextValue = {
     target,
     state,
@@ -250,22 +271,18 @@ export function KubeProvider(
     setNamespace: (namespace) => setState("namespace", namespace),
     setView: (view) => setState("view", view),
     allKinds: () => [...kindsByKey().values()],
-    revealKind: (def) => {
-      const key = kindKey(def);
-      const category = BUILTIN_CATEGORIES.find((c) =>
-        c.kinds.some((k) => kindKey(k) === key),
-      );
+    revealKind: (def) =>
       batch(() => {
-        if (category) {
-          setState("expanded", `cat:${category.id}`, true);
-        } else {
-          setState("expanded", CUSTOM_CATEGORY_ID, true);
-          setState("expanded", `grp:${def.group}`, true);
-        }
-        setState("expanded", `kind:${key}`, true);
-        setState("selectedId", `kind:${key}`);
-      });
-    },
+        expandPath(def);
+        setState("selectedId", `kind:${kindKey(def)}`);
+      }),
+    revealObject: (def, object) =>
+      batch(() => {
+        expandPath(def);
+        setState("selectedId", `obj:${object.metadata.uid}`);
+      }),
+    setLogContainer: (uid, container) =>
+      setState("logContainer", uid, container ?? undefined),
   };
 
   return (

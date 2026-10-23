@@ -1,7 +1,7 @@
 // Main App component: the provider stack, the tree + content layout, and the
 // app-level modals (rendered outside the panes so their keys stay isolated).
 
-import { Show } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import type { Renderable } from "@opentui/core";
 import { useRenderer } from "@opentui/solid";
 import {
@@ -14,6 +14,7 @@ import {
   useFocus,
   useScope,
   useTheme,
+  type LogSearchFilter,
 } from "@andycmaj/opentui-app";
 import { KubeProvider } from "./context/kube";
 import { Tree } from "./components/tree";
@@ -24,6 +25,9 @@ import { DialogProvider, DIALOG_MODAL } from "./context/dialog";
 import { Dialog } from "./components/dialog";
 import { NamespacePicker } from "./components/namespace-picker";
 import { KubeCommandPalette } from "./components/command-palette";
+import { QuickSearch } from "./components/quick-search";
+import { SearchModal } from "./components/search-modal";
+import { ContainerPicker } from "./components/container-picker";
 import { Commands } from "./commands";
 import { keymap, PANES } from "./keymap";
 import type { KubeTarget } from "./kube/kubectl";
@@ -40,6 +44,7 @@ function AppContent() {
   } = useFocus();
   const theme = useTheme();
   const terminal = useTerminal();
+  const [search, setSearch] = createSignal<LogSearchFilter | null>(null);
 
   let layout: Renderable | undefined;
   useScope(
@@ -54,6 +59,7 @@ function AppContent() {
       [Commands.PALETTE_OPEN]: () => openModal("palette"),
       [Commands.HELP_OPEN]: () => openModal("help"),
       [Commands.NAMESPACE_PICK]: () => openModal("namespace"),
+      [Commands.QUICK_SEARCH]: () => openModal("quick-search"),
     },
     { target: () => layout },
   );
@@ -73,7 +79,10 @@ function AppContent() {
         <Show when={sidebarVisible()}>
           <Tree />
         </Show>
-        <Show when={terminal.state()} fallback={<Content />}>
+        <Show
+          when={terminal.state()}
+          fallback={<Content search={search()} onSearchChange={setSearch} />}
+        >
           <TerminalPane />
         </Show>
       </box>
@@ -93,6 +102,19 @@ function AppContent() {
       </Show>
       <Show when={activeModal() === "namespace"}>
         <NamespacePicker onClose={closeModal} />
+      </Show>
+      <Show when={activeModal() === "quick-search"}>
+        <QuickSearch onClose={closeModal} />
+      </Show>
+      <Show when={activeModal() === "search"}>
+        <SearchModal
+          initialQuery={search()?.query ?? ""}
+          onSearch={setSearch}
+          onClose={closeModal}
+        />
+      </Show>
+      <Show when={activeModal() === "container"}>
+        <ContainerPicker onClose={closeModal} />
       </Show>
     </box>
   );

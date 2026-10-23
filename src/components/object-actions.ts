@@ -5,6 +5,7 @@ import { useDialog } from "../context/dialog";
 import { useKube } from "../context/kube";
 import { useTerminal } from "../context/terminal";
 import { kubectlCommand, runKubectl } from "../kube/kubectl";
+import { podContainers } from "../kube/logs";
 import { resourceArg, type KubeObject } from "../kube/types";
 
 const RESTARTABLE = new Set(["Deployment", "StatefulSet", "DaemonSet"]);
@@ -25,23 +26,6 @@ const SHELL = [
   "-c",
   "command -v bash >/dev/null 2>&1 && exec bash || exec sh",
 ];
-
-function firstContainer(obj: KubeObject): string | undefined {
-  const spec = obj.spec ?? {};
-  const pod =
-    obj.kind === "Pod"
-      ? spec
-      : (spec.template as { spec?: Record<string, unknown> } | undefined)?.spec;
-  const containers = pod?.containers;
-  if (!Array.isArray(containers)) return undefined;
-  const first: unknown = containers[0];
-  return typeof first === "object" &&
-    first !== null &&
-    "name" in first &&
-    typeof first.name === "string"
-    ? first.name
-    : undefined;
-}
 
 export function useObjectActions() {
   const kube = useKube();
@@ -75,7 +59,7 @@ export function useObjectActions() {
         showToast(`Can't open a shell in a ${node.def.kind}`, 3000, "error");
         return true;
       }
-      const container = firstContainer(node.object);
+      const container = podContainers(node.object)[0];
       const ref =
         node.def.kind === "Pod"
           ? node.object.metadata.name

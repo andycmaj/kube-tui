@@ -7,6 +7,7 @@ export const Commands = {
 
   // App-level
   NAMESPACE_PICK: "namespace.pick",
+  QUICK_SEARCH: "search.quick",
 
   // Tree
   TREE_TOGGLE: "tree.toggle",
@@ -19,6 +20,9 @@ export const Commands = {
   VIEW_YAML: "view.yaml",
   VIEW_LOGS: "view.logs",
   SCROLL_FOLLOW: "scroll.follow",
+  CONTENT_SEARCH: "content.search",
+  CONTENT_SEARCH_CLEAR: "content.search.clear",
+  LOG_CONTAINER: "logs.container",
 
   // Embedded terminal
   SHELL_OPEN: "terminal.shell",
