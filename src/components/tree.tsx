@@ -15,12 +15,7 @@ import {
 } from "@andycmaj/opentui-app";
 import { Commands } from "../commands";
 import { ContentView, useKube } from "../context/kube";
-import {
-  formatAge,
-  healthCounts,
-  summarize,
-  type Health,
-} from "../kube/status";
+import { formatAge, summarize, type Health } from "../kube/status";
 import { kindLabel } from "../kube/catalog";
 import { isExpandable, type TreeNode } from "../kube/tree";
 import { SidebarStatus } from "./sidebar-status";
@@ -136,12 +131,6 @@ export function Tree() {
     { target: () => pane },
   );
 
-  const totals = createMemo(() => {
-    const objects = kube.nodes().filter((n) => n.type === "object");
-    const counts = healthCounts(objects.map((n) => summarize(n.def, n.object)));
-    return { counts, total: objects.length };
-  });
-
   return (
     <Pane
       name="tree"
@@ -149,14 +138,7 @@ export function Tree() {
       width={SIDEBAR_WIDTH}
       ref={(r) => (pane = r)}
     >
-      <PaneHeader title="Resources">
-        <text fg={theme.textMuted} flexShrink={0}>
-          <span style={{ fg: theme.error }}>✗ {totals().counts.error}</span>{" "}
-          <span style={{ fg: theme.success }}>
-            ✓ {totals().counts.ok}/{totals().total}
-          </span>
-        </text>
-      </PaneHeader>
+      <PaneHeader title="Resources" />
 
       <scrollbox
         ref={(r: ScrollBoxRenderable) => (scrollRef = r)}
