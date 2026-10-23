@@ -1,6 +1,6 @@
 {
   "name": "@andycmaj/kube-tui",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Kubernetes TUI built with OpenTUI Solid",
   "type": "module",
   "private": true,
