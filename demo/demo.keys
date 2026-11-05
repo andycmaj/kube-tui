@@ -1,0 +1,29 @@
+# Site demo for kube-tui, run against KUBE_TUI_FIXTURE=default.
+# Recorded by opentui-app's apps/site/scripts/record.ts.
+wait 800
+key j enter      # Workloads
+key j j enter    # Deployments: kubectl's table for the kind
+wait 1200
+key j j          # api: describe
+wait 1400
+key l            # logs, streaming from every pod
+wait 3200
+key y            # YAML
+wait 1500
+key n            # namespace picker
+type shop
+key enter
+key :            # jump to a kind
+type pods
+key enter
+wait 1200
+key j j j j j j j j   # the crash-looping worker pod
+wait 600
+key d            # describe: CrashLoopBackOff, back-off events
+wait 1800
+key l            # its logs: the panic
+wait 2200
+key ?
+wait 2000
+key esc
+wait 800

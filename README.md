@@ -27,3 +27,17 @@ bun install
 bun dev                       # current context, all namespaces
 bun dev --context my-ctx -n default
 ```
+
+### Fixture mode
+
+Run against a canned cluster, with no kubectl or cluster:
+
+```sh
+KUBE_TUI_FIXTURE=default bun dev
+```
+
+`kubectlCommand` then runs `src/demo/fake-kubectl.ts`, which answers the
+kubectl subset the TUI uses from the demo cluster in `src/demo/cluster.ts`, so
+the app's real watch and parsing code still runs. Shells and edits print a
+notice instead of opening. Source runs only (not compiled binaries).
+`demo/demo.keys` drives the recording on the project website.
