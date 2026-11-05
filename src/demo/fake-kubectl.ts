@@ -6,7 +6,16 @@
 import type { KubeObject } from "../kube/types";
 import { CONTEXT, LIVE_APPS, LOGS, OBJECTS } from "./cluster";
 
-const forever = (): Promise<never> => new Promise(() => {});
+// Streams (watch, logs -f) run until the TUI stops them. Real kubectl would die
+// on its next write once the TUI is gone; this one may sit idle, so it exits
+// when its parent does instead of lingering as an orphan.
+const forever = (): Promise<never> => {
+  const parent = process.ppid;
+  setInterval(() => {
+    if (process.ppid !== parent) process.exit(0);
+  }, 1000);
+  return new Promise(() => {});
+};
 const sleep = (ms: number): Promise<void> =>
   new Promise((r) => setTimeout(r, ms));
 
