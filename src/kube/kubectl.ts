@@ -26,7 +26,18 @@ export interface KubeTarget {
   kubeconfig?: string;
 }
 
+// KUBE_TUI_FIXTURE swaps kubectl for a fake that serves a canned cluster
+// (src/demo), for demos and UI work without a cluster. Source runs only: a
+// compiled binary has no bun or script to run it with.
+export function fixtureMode(): boolean {
+  return Boolean(process.env.KUBE_TUI_FIXTURE);
+}
+
+const FAKE_KUBECTL = new URL("../demo/fake-kubectl.ts", import.meta.url)
+  .pathname;
+
 export function resolveKubectl(override?: string): string {
+  if (fixtureMode()) return FAKE_KUBECTL;
   const binary = Bun.which(override ?? "kubectl");
   if (!binary) throw new KubectlNotFoundError();
   return binary;
@@ -40,7 +51,11 @@ export function targetArgs(target: KubeTarget): string[] {
 }
 
 export function kubectlCommand(target: KubeTarget, args: string[]): string[] {
-  return [resolveKubectl(), ...targetArgs(target), ...args];
+  const kubectl = resolveKubectl();
+  const argv = [...targetArgs(target), ...args];
+  return fixtureMode()
+    ? [process.execPath, kubectl, ...argv]
+    : [kubectl, ...argv];
 }
 
 export interface KubectlResult {
